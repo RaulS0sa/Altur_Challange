@@ -1,0 +1,43 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Django",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/alturChallange/manage.py",
+      "args": ["runserver"],
+      "django": true,
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/alturChallange",
+      "env": {
+        "DJANGO_SETTINGS_MODULE": "alturChallange.settings"
+      }
+    },
+    {
+      "name": "Celery Worker",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "celery",
+      "args": [
+        "-A",
+        "alturChallange",
+        "worker",
+        "-l",
+        "info",
+        "--pool=solo"
+      ],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/alturChallange",
+      "env": {
+        "DJANGO_SETTINGS_MODULE": "alturChallange.settings"
+      }
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Django + Celery",
+      "configurations": ["Django", "Celery Worker"]
+    }
+  ]
+}
