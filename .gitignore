@@ -1,5 +1,5 @@
 /alturChallange/alturChallange/__pycache__
 alturChallange/.env
-/alturChallange/alturChallange/migrations
+*.pyc
 /alturChallange/media
 /alturChallange/alturChallange/services/__pycache__
