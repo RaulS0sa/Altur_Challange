@@ -1,0 +1,21 @@
+
+# 1. Create the app
+heroku create altur-challenge-app
+
+# 2. Add the Database and Redis
+heroku addons:create heroku-postgresql:essential-0
+heroku addons:create heroku-redis:mini
+
+# 3. Set your API Keys
+heroku config:set GROQ_API_KEY=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
+heroku config:set DEEPGRAM_API_KEY=1e7306fd01c9a70b28ffca2c0b5893213e9a0085
+heroku config:set DEBUG=False
+heroku config:set SECRET_KEY=django-insecure-x3^@q*v#v465q-@eyk&ru6#qeca&sw_!hk%lb4407^4#q1#ftj
+
+# 4. Push to deploy
+git add .
+git commit -m "Configure for Heroku deployment"
+git push heroku main
+
+# 5. Run migrations on the cloud DB
+heroku run python manage.py migrate

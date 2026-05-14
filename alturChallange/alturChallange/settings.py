@@ -1,6 +1,8 @@
 from dotenv import load_dotenv
 import os
 load_dotenv()
+
+import dj_database_url
 """
 Django settings for alturChallange project.
 
@@ -28,7 +30,7 @@ SECRET_KEY = 'django-insecure-x3^@q*v#v465q-@eyk&ru6#qeca&sw_!hk%lb4407^4#q1#ftj
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -45,6 +47,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', # Add this line
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -53,7 +56,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'alturChallange.urls'
+ROOT_URLCONF = 'alturChallange.alturChallange.urls'
 
 TEMPLATES = [
     {
@@ -70,7 +73,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'alturChallange.wsgi.application'
+WSGI_APPLICATION = 'alturChallange.alturChallange.wsgi.application'
 
 
 # Database
@@ -79,18 +82,27 @@ WSGI_APPLICATION = 'alturChallange.wsgi.application'
 #import dj_database_url
 #DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": os.getenv("DB_NAME"),
+#         "USER": os.getenv("DB_USER"),
+#         "PASSWORD": os.getenv("DB_PASSWORD"),
+#         "HOST": os.getenv("DB_HOST"),
+#         "PORT": os.getenv("DB_PORT"),
+#     }
+# }
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'alturChallange.alturChallange.settings')
+MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DB_NAME"),
-        "USER": os.getenv("DB_USER"),
-        "PASSWORD": os.getenv("DB_PASSWORD"),
-        "HOST": os.getenv("DB_HOST"),
-        "PORT": os.getenv("DB_PORT"),
-    }
+    'default': dj_database_url.config(conn_max_age=600, ssl_require=True)
 }
 
-CELERY_BROKER_URL = "redis://localhost:6379/0"
+# CELERY_BROKER_URL = "redis://localhost:6379/0"
+CELERY_BROKER_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+
 
 CELERY_BEAT_SCHEDULE = {
     "print-every-5-seconds": {
@@ -137,3 +149,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
