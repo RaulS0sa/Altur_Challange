@@ -13,8 +13,8 @@ def upload_list(request):
         if not audio:
             return HttpResponseBadRequest("Missing audio_file.")
 
-        call = Call.objects.create(filename=audio.name, audio_file=audio)
-        process_call.delay(str(call.id))
+        
+        create_call_from_upload(audio)
         return redirect("upload_list")
 
     calls = Call.objects.order_by("-uploaded_at")
@@ -36,23 +36,6 @@ def api_calls(request):
             for call in calls
         ]
         return JsonResponse(data, safe=False)
-
-    if request.method == "POST":
-        audio = request.FILES.get("audio_file")
-        if not audio:
-            return JsonResponse({"error": "Missing audio_file."}, status=400)
-
-        call = Call.objects.create(filename=audio.name, audio_file=audio)
-        process_call.delay(str(call.id))
-        response_data = {
-            "id": str(call.id),
-            "filename": call.filename,
-            "status": call.status,
-            "uploaded_at": call.uploaded_at.isoformat(),
-            "audio_url": request.build_absolute_uri(call.audio_file.url) if call.audio_file else None,
-        }
-        return JsonResponse(response_data, status=201)
-
     return JsonResponse({"error": "Method not allowed."}, status=405)
 
 
@@ -74,3 +57,54 @@ def api_call_detail(request, call_id):
         "error_message": call.error_message,
     }
     return JsonResponse(response_data)
+
+def create_call_from_upload(audio):
+    call = Call.objects.create(
+        filename=audio.name,
+        audio_file=audio
+    )
+
+    process_call.delay(str(call.id))
+
+    return call
+
+def api_call_export(request, call_id):
+    call = get_object_or_404(Call, id=call_id)
+
+    if request.method != "GET":
+        return JsonResponse(
+            {"error": "Method not allowed."},
+            status=405
+        )
+
+    export_data = {
+        "id": str(call.id),
+        "filename": call.filename,
+        "status": call.status,
+        "uploaded_at": call.uploaded_at.isoformat(),
+        "processed_at": (
+            call.processed_at.isoformat()
+            if call.processed_at
+            else None
+        ),
+        "transcript": call.transcript,
+        "summary": call.summary,
+        "tags": call.tags,
+        "error_message": call.error_message,
+        "audio_url": (
+            request.build_absolute_uri(call.audio_file.url)
+            if call.audio_file
+            else None
+        ),
+    }
+
+    response = JsonResponse(
+        export_data,
+        json_dumps_params={"indent": 2}
+    )
+
+    response["Content-Disposition"] = (
+        f'attachment; filename="call_{call.id}.json"'
+    )
+
+    return response

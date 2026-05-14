@@ -23,7 +23,11 @@ class Call(models.Model):
         default=CallStatus.PENDING,
     )
 
-    transcript = models.TextField(blank=True)
+    # transcript = models.TextField(blank=True)
+    transcript = models.JSONField(
+        null=True,
+        blank=True
+    )
 
     summary = models.TextField(blank=True)
 
@@ -34,6 +38,8 @@ class Call(models.Model):
     processed_at = models.DateTimeField(null=True, blank=True)
 
     error_message = models.TextField(blank=True)
+
+    processing_seconds = models.FloatField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.filename} ({self.status})"

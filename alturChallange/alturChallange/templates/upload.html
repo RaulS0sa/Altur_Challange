@@ -177,6 +177,158 @@
                 align-items: flex-start;
             }
         }
+
+        .status-pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-processing {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.status-completed {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-failed {
+    background: #fee2e2;
+    color: #991b1b;
+}
+.bubble {
+    padding: 14px;
+    border-radius: 18px;
+    margin-bottom: 12px;
+    max-width: 75%;
+}
+
+.speaker-0 {
+    background: #dbeafe;
+    margin-right: auto;
+}
+
+.speaker-1 {
+    background: #e5e7eb;
+    margin-left: auto;
+}
+
+.spinner {
+    width: 12px;
+    height: 12px;
+    border: 2px solid #93c5fd;
+    border-top: 2px solid #2563eb;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.hidden {
+    display: none;
+}
+
+.modal-content {
+    height: 85vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.modal-header button {
+    border: none;
+    background: transparent;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+#modal-transcript {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.modal-actions {
+    margin-top: 24px;
+    display: flex;
+    gap: 12px;
+}
+
+.modal-actions button,
+.modal-actions a {
+    border: none;
+    background: #2563eb;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 12px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-content {
+    width: min(900px, 90vw);
+    height: 85vh;
+
+    background: white;
+    border-radius: 24px;
+    padding: 24px;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+}
+
+#modal-transcript {
+    flex: 1;
+
+    overflow-y: auto;
+
+    padding-right: 8px;
+    margin-top: 20px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+
+    padding: 16px;
+
+    background: #f9fafb;
+}
+
+.modal-actions {
+    margin-top: 20px;
+
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+
+    flex-shrink: 0;
+}
     </style>
 </head>
 <body>
@@ -212,6 +364,7 @@
                     <thead>
                     <tr>
                         <th>Filename</th>
+                        <th>Track</th>
                         <th>Status</th>
                         <th>Uploaded</th>
                         <th>Actions</th>
@@ -219,14 +372,29 @@
                     </thead>
                     <tbody>
                     {% for call in calls %}
-                        <tr>
+                        <tr data-id="{{ call.id }}" data-status="{{ call.status }}">
                             <td>{{ call.filename }}</td>
-                            <td><span class="status-chip">{{ call.status }}</span></td>
+                            <td><audio controls preload="none" style="width: 220px;">
+                                    <source src="{{ call.audio_file.url }}">
+                                </audio>
+                            </td>
+                            <td class="status-cell">
+                                <span class="status-chip status-{{ call.status|lower }}">
+                                    {{ call.status }}
+                                </span>
+                            </td>
                             <td>{{ call.uploaded_at|date:'Y-m-d H:i' }}</td>
                             <td>
-                                <a href="{{ call.audio_file.url }}" target="_blank">Download</a>
+                                <button onclick="openCallModal('{{ call.id }}')">
+    View
+</button>
+                                <!-- <a href="{{ call.audio_file.url }}" target="_blank">Download</a>
                                 &nbsp;|&nbsp;
                                 <a href="{% url 'api_call_detail' call.id %}">API details</a>
+                                &nbsp;|&nbsp;
+<a href="{% url 'api_call_export' call.id %}">
+    Export JSON
+</a> -->
                             </td>
                         </tr>
                     {% endfor %}
@@ -247,6 +415,144 @@
             </ul>
         </section>
     </main>
+    <div id="call-modal" class="modal hidden">
+    <div class="modal-content">
+
+    <div class="modal-header">
+        <h2 id="modal-title"></h2>
+        <button onclick="closeModal()">✕</button>
+    </div>
+<!-- SCROLLABLE TRANSCRIPT -->
+    <div id="modal-transcript"></div>
+    <!-- TOP INFO -->
+    <div class="modal-meta">
+        <audio id="modal-audio" controls></audio>
+        <div id="modal-status"></div>
+        <div id="modal-summary"></div>
+        <div id="modal-tags"></div>
+    </div>
+
+
+
+    <!-- FIXED ACTIONS -->
+    <div class="modal-actions">
+        <button id="refresh-button">Refresh</button>
+        <a id="export-button">Export JSON</a>
+    </div>
+
+</div>
+</div>
 </div>
 </body>
+<script>
+function renderStatus(status) {
+    return `
+        <span class="status-chip status-${status.toLowerCase()}">
+            ${status}
+        </span>
+    `;
+}
+
+function closeModal() {
+    document
+        .getElementById("call-modal")
+        .classList.add("hidden");
+}
+
+async function openCallModal(callId) {
+    const modal =
+        document.getElementById("call-modal");
+
+    modal.classList.remove("hidden");
+
+    const response = await fetch(
+        `/api/calls/${callId}/`
+    );
+
+    const data = await response.json();
+
+    document.getElementById("modal-title")
+        .innerText = data.filename;
+
+    document.getElementById("modal-audio")
+        .src = data.audio_url;
+
+    document.getElementById("modal-status")
+        .innerHTML = renderStatus(data.status);
+
+    document.getElementById("modal-summary")
+        .innerHTML = `
+            <h3>Summary</h3>
+            <p>${data.summary || "Not available"}</p>
+        `;
+
+    document.getElementById("modal-tags")
+        .innerHTML = `
+            <h3>Tags</h3>
+            <pre>${JSON.stringify(data.tags, null, 2)}</pre>
+        `;
+
+    const transcript =
+        document.getElementById(
+            "modal-transcript"
+        );
+
+    transcript.innerHTML = "";
+
+    if (data.transcript) {
+        for (const msg of data.transcript) {
+            transcript.innerHTML += `
+                <div class="bubble speaker-${msg.speaker}">
+                    <strong>Speaker ${msg.speaker}</strong>
+                    <div>${msg.text}</div>
+                </div>
+            `;
+        }
+    }
+
+    document.getElementById("export-button")
+        .href = `/api/calls/${callId}/export/`;
+
+    document.getElementById("refresh-button")
+        .onclick = () => openCallModal(callId);
+}
+
+async function refreshRow(callId) {
+    const response = await fetch(
+        `/api/calls/${callId}/`
+    );
+
+    const data = await response.json();
+
+    const row =
+        document.querySelector(
+            `[data-id="${callId}"]`
+        );
+
+    if (!row) return;
+
+    row.querySelector(".status-cell")
+        .innerHTML = renderStatus(data.status);
+
+    row.dataset.status = data.status;
+}
+
+async function refreshPendingRows() {
+    const rows =
+        document.querySelectorAll("[data-status]");
+
+    for (const row of rows) {
+        const status = row.dataset.status;
+
+        if (
+            status !== "COMPLETED" &&
+            status !== "FAILED"
+        ) {
+            await refreshRow(row.dataset.id);
+        }
+    }
+}
+
+setInterval(refreshPendingRows, 5000);
+</script>
 </html>
