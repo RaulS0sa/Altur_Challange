@@ -7,3 +7,4 @@ python-dotenv
 groq
 gunicorn
 whitenoise
+dj-database-url
