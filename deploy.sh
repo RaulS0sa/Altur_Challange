@@ -19,7 +19,7 @@ heroku config:set SECRET_KEY="$SECRET" --app $APP_NAME
 echo "📤 Pushing code to Heroku..."
 git add --all
 git commit -m "Fix requirements, static files, and nested paths $(date +%T)"
-git push heroku main
+git push heroku heroku_deploy
 
 # 3. Run Migrations (Using python3 explicitly)
 echo "🗄️ Running migrations..."
