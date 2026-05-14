@@ -91,7 +91,7 @@ WSGI_APPLICATION = 'alturChallange.wsgi.application'
 #         "PORT": os.getenv("DB_PORT"),
 #     }
 # }
-
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'alturChallange.alturChallange.settings')
 MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
