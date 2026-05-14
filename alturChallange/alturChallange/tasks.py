@@ -11,7 +11,8 @@ from .services.stt_service import transcribe
 #from .services.analysis_service import run_analysis
 from .services.analysis_service_groq import run_analysis
 
-
+import requests
+from tempfile import NamedTemporaryFile
 
 
 
@@ -31,7 +32,16 @@ def process_call(self, call_id):
 
 
         print(f"Processing: {call.audio_file.path}")
-        transcript = transcribe(call.audio_file.path)
+        # transcript = transcribe(call.audio_file.path)
+        url = call.audio_file.url
+        response = requests.get(url)
+        response.raise_for_status()
+
+        with NamedTemporaryFile(suffix=".wav") as tmp:
+            tmp.write(response.content)
+            tmp.flush()
+
+            transcript = transcribe(tmp.name)
 
 
         call.transcript = transcript
