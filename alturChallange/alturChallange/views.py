@@ -18,8 +18,30 @@ def upload_list(request):
         create_call_from_upload(audio)
         return redirect("upload_list")
 
+    
+
+
     calls = Call.objects.order_by("-uploaded_at")
-    return render(request, "upload.html", {"calls": calls})
+    completed = Call.objects.filter(status="COMPLETED")
+    
+    # Calculate intents
+    intents = {}
+    total_tags = 0
+    for c in completed:
+        if isinstance(c.tags, dict):
+            it = c.tags.get('intent', 'other')
+            intents[it] = intents.get(it, 0) + 1
+            total_tags += len(c.tags)
+
+    stats = {
+        "total": calls.count(),
+        "completed": completed.count(),
+        "avg_tags": round(total_tags / completed.count(), 1) if completed.count() > 0 else 0,
+        "intents": intents
+    }
+
+    return render(request, "upload.html", {"calls": calls, "stats": stats})
+    
 
 
 def api_calls(request):

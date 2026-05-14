@@ -334,86 +334,131 @@
 <body>
 <div class="page">
     <aside class="sidenav">
-        <h2>Call Manager</h2>
-        <a href="{% url 'upload_list' %}" class="active">Upload & view files</a>
-        <a href="{% url 'api_calls' %}">API list</a>
-        <a href="#api-docs">API docs</a>
-    </aside>
+    <h2>Call Manager</h2>
+    <a href="#" id="nav-calls" class="active" onclick="showSection('calls')">Upload & View Files</a>
+    <a href="#" id="nav-stats" onclick="showSection('stats')">Analytics Dashboard</a>
+    <a href="{% url 'api_calls' %}" target="_blank">API List</a>
+</aside>
 
     <main class="main">
-        <div class="header-row">
-            <div>
-                <h1>Uploaded Calls</h1>
-                <p class="hint">Upload a new audio file and manage previously uploaded calls from one page.</p>
+        <div id="section-calls">
+            <div class="header-row">
+                <div>
+                    <h1>Uploaded Calls</h1>
+                    <p class="hint">Upload a new audio file and manage previously uploaded calls from one page.</p>
+                </div>
             </div>
-        </div>
 
-        <section class="panel">
-            <h2>Upload new file</h2>
-            <form class="upload-form" method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <input type="file" name="audio_file" accept=".mp3,.wav" required>
-                <button type="submit">Upload file</button>
-            </form>
-        </section>
+            <section class="panel">
+                <h2>Upload new file</h2>
+                <form class="upload-form" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="file" name="audio_file" accept=".mp3,.wav" required>
+                    <button type="submit">Upload file</button>
+                </form>
+            </section>
 
-        <section class="panel">
-            <h2>Uploaded files</h2>
-            {% if calls %}
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Filename</th>
-                        <th>Track</th>
-                        <th>Status</th>
-                        <th>Uploaded</th>
-                        <th>Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for call in calls %}
-                        <tr data-id="{{ call.id }}" data-status="{{ call.status }}">
-                            <td>{{ call.filename }}</td>
-                            <td><audio controls preload="none" style="width: 220px;">
-                                    <source src="{{ call.audio_file.url }}">
-                                </audio>
-                            </td>
-                            <td class="status-cell">
-                                <span class="status-chip status-{{ call.status|lower }}">
-                                    {{ call.status }}
-                                </span>
-                            </td>
-                            <td>{{ call.uploaded_at|date:'Y-m-d H:i' }}</td>
-                            <td>
-                                <button onclick="openCallModal('{{ call.id }}')">
-    View
-</button>
-                                <!-- <a href="{{ call.audio_file.url }}" target="_blank">Download</a>
-                                &nbsp;|&nbsp;
-                                <a href="{% url 'api_call_detail' call.id %}">API details</a>
-                                &nbsp;|&nbsp;
-<a href="{% url 'api_call_export' call.id %}">
-    Export JSON
-</a> -->
-                            </td>
+            <section class="panel">
+                <h2>Uploaded files</h2>
+                {% if calls %}
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Filename</th>
+                            <th>Track</th>
+                            <th>Status</th>
+                            <th>Uploaded</th>
+                            <th>Actions</th>
                         </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            {% else %}
-                <p class="hint">No files have been uploaded yet. Use the form above to add your first call.</p>
-            {% endif %}
-        </section>
+                        </thead>
+                        <tbody>
+                        {% for call in calls %}
+                            <tr data-id="{{ call.id }}" data-status="{{ call.status }}">
+                                <td>{{ call.filename }}</td>
+                                <td><audio controls preload="none" style="width: 220px;">
+                                        <source src="{{ call.audio_file.url }}">
+                                    </audio>
+                                </td>
+                                <td class="status-cell">
+                                    <span class="status-chip status-{{ call.status|lower }}">
+                                        {{ call.status }}
+                                    </span>
+                                </td>
+                                <td>{{ call.uploaded_at|date:'Y-m-d H:i' }}</td>
+                                <td>
+                                    <button onclick="openCallModal('{{ call.id }}')">
+        View
+    </button>
+                                    <!-- <a href="{{ call.audio_file.url }}" target="_blank">Download</a>
+                                    &nbsp;|&nbsp;
+                                    <a href="{% url 'api_call_detail' call.id %}">API details</a>
+                                    &nbsp;|&nbsp;
+    <a href="{% url 'api_call_export' call.id %}">
+        Export JSON
+    </a> -->
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="hint">No files have been uploaded yet. Use the form above to add your first call.</p>
+                {% endif %}
+            </section>
 
-        <section class="panel" id="api-docs">
-            <h2>REST endpoints</h2>
-            <p class="hint">Use these endpoints to integrate with external tools or to fetch upload metadata.</p>
-            <ul>
-                <li><code>GET /api/calls/</code> — list uploaded calls</li>
-                <li><code>POST /api/calls/</code> — upload a file via multipart form field <code>audio_file</code></li>
-                <li><code>GET /api/calls/&lt;uuid&gt;/</code> — get details for a specific call</li>
-            </ul>
-        </section>
+            <section class="panel" id="api-docs">
+                <h2>REST endpoints</h2>
+                <p class="hint">Use these endpoints to integrate with external tools or to fetch upload metadata.</p>
+                <ul>
+                    <li><code>GET /api/calls/</code> — list uploaded calls</li>
+                    <li><code>POST /api/calls/</code> — upload a file via multipart form field <code>audio_file</code></li>
+                    <li><code>GET /api/calls/&lt;uuid&gt;/</code> — get details for a specific call</li>
+                </ul>
+            </section>
+        </div>
+        <!-- SECTION 2: ANALYTICS (Hidden by default) -->
+        <div id="section-stats" class="hidden">
+    <div class="header-row">
+        <h1>Analytics Dashboard</h1>
+        <p class="hint">Aggregate data from all processed calls.</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+        <div class="panel">
+            <h3 style="color: var(--muted); font-size: 0.9rem;">TOTAL PROCESSED</h3>
+            <p style="font-size: 2.5rem; font-weight: bold; margin: 10px 0;">{{ stats.completed }}</p>
+            <p class="hint">out of {{ stats.total }} total uploads</p>
+        </div>
+        <div class="panel">
+            <h3 style="color: var(--muted); font-size: 0.9rem;">AVG TAGS PER CALL</h3>
+            <p style="font-size: 2.5rem; font-weight: bold; margin: 10px 0;">{{ stats.avg_tags }}</p>
+            <p class="hint">Metadata density metric</p>
+        </div>
+    </div>
+
+    <section class="panel" style="margin-top: 20px;">
+        <h2>Intent Distribution</h2>
+        <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 20px;">
+            {% for intent, count in stats.intents.items %}
+            <div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                    <!-- Use 'title' filter to turn 'money_transfer' into 'Money Transfer' -->
+                    <span style="font-weight: 600;">{{ intent|title }}</span>
+                    <span>{{ count }} calls</span>
+                </div>
+                <div style="background: #e5e7eb; height: 10px; border-radius: 5px; overflow: hidden;">
+                    <!-- Added a check to ensure stats.completed isn't 0 to avoid division errors -->
+                    {% if stats.completed > 0 %}
+                        <div style="background: var(--accent); height: 100%; width: {% widthratio count stats.completed 100 %}%;"></div>
+                    {% else %}
+                        <div style="background: var(--accent); height: 100%; width: 0%;"></div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
     </main>
     <div id="call-modal" class="modal hidden">
     <div class="modal-content">
@@ -551,6 +596,16 @@ async function refreshPendingRows() {
             await refreshRow(row.dataset.id);
         }
     }
+}
+
+function showSection(section) {
+    // Toggle Sections
+    document.getElementById('section-calls').classList.toggle('hidden', section !== 'calls');
+    document.getElementById('section-stats').classList.toggle('hidden', section !== 'stats');
+
+    // Toggle Nav States
+    document.getElementById('nav-calls').classList.toggle('active', section === 'calls');
+    document.getElementById('nav-stats').classList.toggle('active', section === 'stats');
 }
 
 setInterval(refreshPendingRows, 5000);
