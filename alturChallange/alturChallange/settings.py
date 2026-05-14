@@ -56,7 +56,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'alturChallange.urls'
+ROOT_URLCONF = 'alturChallange.alturChallange.urls'
 
 TEMPLATES = [
     {
@@ -73,7 +73,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'alturChallange.wsgi.application'
+WSGI_APPLICATION = 'alturChallange.alturChallange.wsgi.application'
 
 
 # Database
