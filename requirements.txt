@@ -5,3 +5,5 @@ redis
 requests
 python-dotenv
 groq
+gunicorn
+whitenoise

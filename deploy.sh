@@ -8,27 +8,22 @@ SECRET="django-insecure-x3^@q*v#v465q-@eyk&ru6#qeca&sw_!hk%lb4407^4#q1#ftj"
 
 echo "🚀 Starting Deployment for $APP_NAME..."
 
-# 1. Setup Buildpack
-heroku buildpacks:set heroku/python --app $APP_NAME
-
-# 2. Set Config Vars
+# 1. Set Config Vars
 echo "🔑 Setting environment variables..."
 heroku config:set GROQ_API_KEY="$GROQ_KEY" --app $APP_NAME
 heroku config:set DEEPGRAM_API_KEY="$DEEPGRAM_KEY" --app $APP_NAME
 heroku config:set DEBUG=False --app $APP_NAME
-# Using double quotes so the variable expands correctly
 heroku config:set SECRET_KEY="$SECRET" --app $APP_NAME
 
-# 3. Commit and Push
+# 2. Push code
 echo "📤 Pushing code to Heroku..."
 git add --all
-# We add a timestamp so the commit is always unique, forcing a new build
-git commit -m "Fix project structure for Heroku $(date +%Y%m%d_%H%M%S)"
+git commit -m "Fix requirements, static files, and nested paths $(date +%T)"
 git push heroku main
 
-# 4. Run Migrations
+# 3. Run Migrations (Using python3 explicitly)
 echo "🗄️ Running migrations..."
-heroku run python manage.py migrate --app $APP_NAME
+heroku run python3 manage.py migrate --app $APP_NAME
 
 echo "✅ Deployment Complete!"
 heroku open --app $APP_NAME
