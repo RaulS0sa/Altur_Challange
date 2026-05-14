@@ -100,6 +100,13 @@ DATABASES = {
     'default': dj_database_url.config(conn_max_age=600, ssl_require=True)
 }
 
+import os
+
+BASE_URL = os.environ.get(
+    "BASE_URL",
+    "http://127.0.0.1:8000"
+)
+
 # CELERY_BROKER_URL = "redis://localhost:6379/0"
 CELERY_BROKER_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
 

@@ -3,7 +3,7 @@ from django.utils import timezone
 from time import sleep
 
 from .models import Call, CallStatus
-import os
+from django.conf import settings
 
 import json
 from .services.stt_service import transcribe
@@ -33,8 +33,8 @@ def process_call(self, call_id):
 
         print(f"Processing: {call.audio_file.path}")
         # transcript = transcribe(call.audio_file.path)
-        BASE_URL = "https://altur-challenge-app-8d11da3e7c1b.herokuapp.com"
-        url = BASE_URL + call.audio_file.url
+        
+        url = settings.BASE_URL + call.audio_file.url
         response = requests.get(url)
         response.raise_for_status()
 
