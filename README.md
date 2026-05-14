@@ -2,6 +2,12 @@
 
 A full-stack Django application designed to process, transcribe, and analyze sales/support calls using state-of-the-art AI. This tool provides diarized transcripts, automated summaries, and intent-based tagging to help sales teams gain insights from their conversations.
 
+## Try the App!
+[heroku app](https://altur-challenge-app-8d11da3e7c1b.herokuapp.com/)
+
+## Arquitecture
+![Diagrama](diagram.png)
+
 ## 🚀 Key Features
 - **Asynchronous Processing**: Uses Celery and Redis to handle calls up to 30 minutes long without blocking the UI.
 - **High-Fidelity STT**: Integrated with **Deepgram (Nova-2)** for diarized transcription (Speaker 0 vs. Speaker 1).
@@ -119,3 +125,6 @@ This app is ready for Heroku deployment using the provided `Procfile`.
 1.  Add **Heroku Postgres** and **Heroku Data for Redis** add-ons.
 2.  Set `GROQ_API_KEY` and `DEEPGRAM_API_KEY` in the Heroku Config Vars.
 3.  The app uses `Whitenoise` to serve static assets efficiently in a production environment.
+
+# P.d.
+there are many commits because heroku were stubborn fo the deployment

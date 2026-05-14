@@ -14,6 +14,7 @@ heroku config:set GROQ_API_KEY="$GROQ_KEY" --app $APP_NAME
 heroku config:set DEEPGRAM_API_KEY="$DEEPGRAM_KEY" --app $APP_NAME
 heroku config:set DEBUG=False --app $APP_NAME
 heroku config:set SECRET_KEY="$SECRET" --app $APP_NAME
+heroku config:set BASE_URL=https://altur-challenge-app-8d11da3e7c1b.herokuapp.com
 
 # 2. Push code
 echo "📤 Pushing code to Heroku..."
