@@ -1,1 +1,1 @@
-web: gunicorn alturChallange.wsgi:application
+web: gunicorn alturChallange.alturChallange.wsgi:application
