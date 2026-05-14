@@ -1,2 +1,2 @@
-web: gunicorn alturChallange.wsgi
+web: gunicorn alturChallange.wsgi:application
 worker: celery -A alturChallange worker -l info
