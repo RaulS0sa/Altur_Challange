@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from .models import Call
 from .tasks import process_call
+from .models import Call, CallStatus
 
 
 def upload_list(request):
@@ -108,3 +109,27 @@ def api_call_export(request, call_id):
     )
 
     return response
+
+def analytics_dashboard(request):
+    completed_calls = Call.objects.filter(status=CallStatus.COMPLETED)
+    total_count = Call.objects.count()
+    
+    # Calculate Tag Distribution
+    intent_counts = {}
+    total_tags = 0
+    
+    for call in completed_calls:
+        if isinstance(call.tags, dict):
+            intent = call.tags.get('intent', 'unknown')
+            intent_counts[intent] = intent_counts.get(intent, 0) + 1
+            total_tags += len(call.tags)
+
+    avg_tags = total_tags / completed_calls.count() if completed_calls.exists() else 0
+
+    context = {
+        "total_calls": total_count,
+        "completed_calls": completed_calls.count(),
+        "avg_tags": round(avg_tags, 1),
+        "intent_counts": intent_counts,
+    }
+    return render(request, "analytics.html", context)

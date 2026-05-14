@@ -26,11 +26,8 @@ urlpatterns = [
     path("", views.upload_list, name="upload_list"),
     path("api/calls/", views.api_calls, name="api_calls"),
     path("api/calls/<uuid:call_id>/", views.api_call_detail, name="api_call_detail"),
-    path(
-    "api/calls/<uuid:call_id>/export/",
-    views.api_call_export,
-    name="api_call_export",
-),
+    path("api/calls/<uuid:call_id>/export/",views.api_call_export,name="api_call_export",),
+    path("analytics/", views.analytics_dashboard, name="analytics"),
 ]
 
 if settings.DEBUG:

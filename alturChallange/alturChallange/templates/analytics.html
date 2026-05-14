@@ -1,0 +1,18 @@
+<div class="page">
+    <!-- Use your same sidenav here -->
+    <main class="main">
+        <h1>Analytics Dashboard</h1>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+            <div class="panel"><h3>Total Calls</h3><p style="font-size: 2rem;">{{ total_calls }}</p></div>
+            <div class="panel"><h3>Completed</h3><p style="font-size: 2rem; color: green;">{{ completed_calls }}</p></div>
+            <div class="panel"><h3>Avg Tags/Call</h3><p style="font-size: 2rem;">{{ avg_tags }}</p></div>
+        </div>
+
+        <div class="panel" style="margin-top: 20px;">
+            <h2>Intent Distribution</h2>
+            {% for intent, count in intent_counts.items %}
+                <p>{{ intent }}: <strong>{{ count }}</strong></p>
+            {% endfor %}
+        </div>
+    </main>
+</div>

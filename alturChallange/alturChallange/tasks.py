@@ -8,7 +8,8 @@ import os
 import json
 from .services.stt_service import transcribe
 
-from .services.analysis_service import run_analysis
+#from .services.analysis_service import run_analysis
+from .services.analysis_service_groq import run_analysis
 
 
 
