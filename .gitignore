@@ -3,3 +3,4 @@ alturChallange/.env
 *.pyc
 /alturChallange/media
 /alturChallange/alturChallange/services/__pycache__
+deploy_new.sh
