@@ -34,7 +34,7 @@ A full-stack Django application designed to process, transcribe, and analyze sal
 
 ### 1. Clone the repository
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/RaulS0sa/Altur_Challange
 cd altur-challenge
 ```
 
