@@ -3,7 +3,9 @@
 A full-stack Django application designed to process, transcribe, and analyze sales/support calls using state-of-the-art AI. This tool provides diarized transcripts, automated summaries, and intent-based tagging to help sales teams gain insights from their conversations.
 
 ## Try the App!
-[heroku app](https://altur-challenge-app-8d11da3e7c1b.herokuapp.com/)
+1.- Download a sample call from the "sample_files" folder
+
+2.- access the [heroku app](https://altur-challenge-app-8d11da3e7c1b.herokuapp.com/) and add a file in the first section, dont forget to click "upload file" button
 
 ## Arquitecture
 ![Diagrama](diagram.png)
